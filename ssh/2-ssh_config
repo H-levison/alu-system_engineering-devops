@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Configure SSH client
+SSH_CONFIG_FILE="$HOME/.ssh/config"
+echo -e "Host myserver\n  IdentityFile ~/.ssh/school\n  PasswordAuthentication no" >> "$SSH_CONFIG_FILE"
