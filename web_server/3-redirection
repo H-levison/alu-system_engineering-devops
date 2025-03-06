@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#!/usr/bin/env bash
 # Ensure script is run as root
 if [ "$EUID" -ne 0 ]; then
     echo "Please run as root"
@@ -6,8 +7,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Install Nginx if not installed
-apt update -y
-apt install -y nginx
+sudo apt update -y
+sudo apt install -y nginx
 
 # Modify Nginx config with sudo
 sudo sed -i '/server_name _;/a \\n    location /redirect_me {\n        return 301 http://honourgod.tech;\n    }' /etc/nginx/sites-available/default
