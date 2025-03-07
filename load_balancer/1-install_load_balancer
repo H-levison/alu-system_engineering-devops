@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#!/bin/bash
+
+# Install HAProxy if not already installed
+if ! dpkg -l | grep -q haproxy; then
+    sudo apt update
+    sudo apt install -y haproxy
+fi
+
+# Configure HAProxy
+HAPROXY_CFG="/etc/haproxy/haproxy.cfg"
+
+# Backup existing HAProxy config
+sudo cp "$HAPROXY_CFG" "$HAPROXY_CFG.bak"
+
+# Define HAProxy configuration
+sudo tee "$HAPROXY_CFG" > /dev/null <<EOL
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log global
+    option redispatch
+    option dontlognull
+    timeout connect 5s
+    timeout client 50s
+    timeout server 50s
+
+frontend http_front
+    bind *:80
+    default_backend web_servers
+
+backend web_servers
+    balance roundrobin
+    server web-01 6475-web-01:80 check
+    server web-02 6475-web-02:80 check
+EOL
+
+# Restart HAProxy to apply changes
+sudo systemctl restart haproxy
+sudo systemctl enable haproxy
+
+echo "HAProxy has been configured with round-robin load balancing for web-01 and web-02."
