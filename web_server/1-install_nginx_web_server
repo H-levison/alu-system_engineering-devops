@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
-# installing nginx
+# Update package lists
+sudo apt-get -y update
 
-apt-get update -y
-apt-get install -y nginx
-chown -R www-data:www-data /var/www/html
-echo "Holberton School for the win!" > /var/www/html/index.html
-service nginx restart
+# Install Nginx
+sudo apt-get -y install nginx
+
+# Ensure Nginx is listening on port 80
+sudo sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
+
+# Ensure correct ownership for Nginx user
+sudo chown -R www-data:www-data /var/www/html
+
+# Modify the default index.html to contain "Holberton School"
+echo "Holberton School" | sudo tee /var/www/html/index.html > /dev/null
+
+# Reload Nginx without using systemctl (minimal downtime)
+sudo nginx -s reload
+
+echo "Nginx has been installed and configured successfully!"
