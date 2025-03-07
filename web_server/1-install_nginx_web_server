@@ -14,7 +14,7 @@ sudo chown -R www-data:www-data /var/www/html
 # Modify the default index.html to contain "Holberton School"
 echo "Holberton School" | sudo tee /var/www/html/index.html > /dev/null
 
-# Reload Nginx without using systemctl (minimal downtime)
-sudo nginx -s reload
+# Restart Nginx using service command
+sudo service nginx restart
 
 echo "Nginx has been installed and configured successfully!"
