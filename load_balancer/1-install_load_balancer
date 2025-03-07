@@ -1,20 +1,17 @@
 #!/usr/bin/env bash
-#!/bin/bash
+# Script to install and configure HAProxy on lb-01
 
-# Install HAProxy if not already installed
-if ! dpkg -l | grep -q haproxy; then
-    sudo apt update
-    sudo apt install -y haproxy
-fi
+# Update package list
+sudo apt-get update -y
 
-# Configure HAProxy
-HAPROXY_CFG="/etc/haproxy/haproxy.cfg"
+# Install HAProxy
+sudo apt-get install -y haproxy
 
-# Backup existing HAProxy config
-sudo cp "$HAPROXY_CFG" "$HAPROXY_CFG.bak"
+# Backup HAProxy config file
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
 
-# Define HAProxy configuration
-sudo tee "$HAPROXY_CFG" > /dev/null <<EOL
+# Configure HAProxy with round-robin and server hostnames
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
 global
     log /dev/log local0
     log /dev/log local1 notice
@@ -27,7 +24,8 @@ global
 
 defaults
     log global
-    option redispatch
+    mode http
+    option httplog
     option dontlognull
     timeout connect 5s
     timeout client 50s
@@ -39,9 +37,14 @@ frontend http_front
 
 backend web_servers
     balance roundrobin
-    server web-01 6475-web-01:80 check
-    server web-02 6475-web-02:80 check
+    server 6475-web-01 54.161.60.25:80 check
+    server 6475-web-02 3.86.91.179:80 check
 EOL
 
-# Restart HAProxy to apply changes
-sudo service nginx restart
+# Restart HAProxy service using 'service' command
+sudo service haproxy restart
+
+# Enable HAProxy to start on boot
+sudo systemctl enable haproxy
+
+echo "HAProxy has been successfully installed and configured."
