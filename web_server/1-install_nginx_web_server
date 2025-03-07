@@ -5,6 +5,8 @@ sudo apt update -y
 # Install Nginx
 sudo apt install -y nginx
 
+sudo chown -R "$USER":"$USER" /var/www/html
+
 # Ensure Nginx is listening on port 80
 sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
 
