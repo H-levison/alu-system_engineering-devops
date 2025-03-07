@@ -10,13 +10,7 @@ apt update -y
 apt install -y nginx
 
 # Create the custom 404 error page
-echo "<html>
-    <head><title>404 Not Found</title></head>
-    <body>
-        <h1>404 Not Found</h1>
-        <p>Ceci n'est pas une page</p>
-    </body>
-</html>" > /var/www/html/404.html
+echo "Ceci n'est pas une page" > /var/www/html/404.html
 
 # Add the error_page directive to the Nginx default config without overwriting
 sed -i '/server_name _;/a \    error_page 404 /404.html;\n    location = /404.html {\n        internal;\n    }' /etc/nginx/sites-available/default
