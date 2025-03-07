@@ -19,4 +19,4 @@ sed -i '/server_name _;/a \    error_page 404 /404.html;\n    location = /404.ht
 nginx -t
 
 # Reload Nginx without using systemctl
-nginx -s reload
+sudo service nginx restart
