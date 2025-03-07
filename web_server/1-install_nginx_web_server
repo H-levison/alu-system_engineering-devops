@@ -9,11 +9,7 @@ sudo apt install -y nginx
 sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
 
 # Modify the default index.html to contain "Holberton School"
-echo "Holberton School says hello hii" | sudo tee /var/www/html/index.html
-
-sudo chown -R "$USER":"$USER" /var/www/html
+echo "Holberton School" | sudo tee /var/www/html/index.html
 
 # Reload Nginx without using systemctl
 nginx -s reload
-
-
