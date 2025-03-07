@@ -21,6 +21,6 @@ HOSTNAME=$(hostname)
 echo "Configured with hostname: $HOSTNAME"
 
 # Restart Nginx to apply changes
-sudo systemctl restart nginx
+sudo service nginx restart
 
 echo "Nginx is now configured with the custom header 'X-Served-By: $HOSTNAME'"

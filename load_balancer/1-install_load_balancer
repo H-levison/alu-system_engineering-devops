@@ -44,11 +44,4 @@ backend web_servers
 EOL
 
 # Restart HAProxy to apply changes
-sudo systemctl restart haproxy
-sudo systemctl enable haproxy
-
-echo "HAProxy has been configured with round-robin load balancing for web-01 and web-02."
-
-echo -e "web-01 web-02"
-echo "web-01"
-echo "web-02"
+sudo service nginx restart
