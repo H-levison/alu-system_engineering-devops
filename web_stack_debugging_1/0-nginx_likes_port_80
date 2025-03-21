@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-
-#!/bin/bash
-
 # Install Nginx if not already installed
 if ! dpkg -l | grep -q nginx; then
     echo "Installing Nginx..."
