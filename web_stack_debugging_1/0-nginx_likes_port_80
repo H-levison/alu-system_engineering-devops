@@ -8,7 +8,7 @@ else
     echo "Nginx is already installed."
 fi
 
-# Check if Nginx service is active
+# Start Nginx if it's not running
 if ! systemctl is-active --quiet nginx; then
     echo "Starting Nginx service..."
     sudo systemctl start nginx
@@ -16,11 +16,11 @@ else
     echo "Nginx is already running."
 fi
 
-# Ensure Nginx is listening on port 80
+# Configure Nginx to listen on all IP addresses on port 80
 echo "Configuring Nginx to listen on port 80..."
 sudo sed -i 's/listen 127.0.0.1:80;/listen 0.0.0.0:80;/' /etc/nginx/sites-available/default
 
-# Open port 80 in the firewall if necessary
+# Allow traffic on port 80 through the firewall
 echo "Configuring firewall to allow traffic on port 80..."
 sudo ufw allow 80/tcp
 sudo ufw reload
@@ -29,15 +29,23 @@ sudo ufw reload
 echo "Restarting Nginx..."
 sudo systemctl restart nginx
 
-# Verify if Nginx is listening on port 80
+# Verify Nginx is listening on port 80
 echo "Verifying if Nginx is listening on port 80..."
-sudo netstat -tuln | grep :80 || echo "Nginx is not listening on port 80."
+if sudo netstat -tuln | grep -q ':80'; then
+    echo "Nginx is listening on port 80."
+else
+    echo "Nginx is NOT listening on port 80."
+    exit 1
+fi
 
-# Check for errors in Nginx logs
-echo "Checking for any errors in Nginx logs..."
-sudo tail -n 20 /var/log/nginx/error.log
+# Check if Nginx is returning a valid HTTP response
+echo "Checking if Nginx is serving a page on port 80..."
+HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:80)
 
-# Test if Nginx serves the page on port 80
-echo "Testing if Nginx is serving the page on port 80..."
-curl -I localhost:80
+if [ "$HTTP_STATUS" -eq 200 ]; then
+    echo "Nginx is serving the page successfully with HTTP 200."
+else
+    echo "Nginx returned HTTP status $HTTP_STATUS."
+    exit 2
+fi
 
