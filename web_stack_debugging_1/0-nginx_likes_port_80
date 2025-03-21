@@ -1,31 +1,43 @@
 #!/usr/bin/env bash
-# Install Nginx if not already installed
+# Check if Nginx is installed
 if ! dpkg -l | grep -q nginx; then
     echo "Installing Nginx..."
     sudo apt update
     sudo apt install -y nginx
+else
+    echo "Nginx is already installed."
 fi
 
-# Ensure Nginx is started
-echo "Starting Nginx..."
-sudo systemctl start nginx
+# Check if Nginx service is active
+if ! systemctl is-active --quiet nginx; then
+    echo "Starting Nginx service..."
+    sudo systemctl start nginx
+else
+    echo "Nginx is already running."
+fi
 
-# Configure Nginx to listen on port 80
+# Ensure Nginx is listening on port 80
 echo "Configuring Nginx to listen on port 80..."
 sudo sed -i 's/listen 127.0.0.1:80;/listen 0.0.0.0:80;/' /etc/nginx/sites-available/default
 
 # Open port 80 in the firewall if necessary
 echo "Configuring firewall to allow traffic on port 80..."
 sudo ufw allow 80/tcp
+sudo ufw reload
 
-# Restart Nginx to apply the configuration changes
+# Restart Nginx to apply changes
 echo "Restarting Nginx..."
 sudo systemctl restart nginx
 
-# Verify Nginx is listening on port 80
+# Verify if Nginx is listening on port 80
 echo "Verifying if Nginx is listening on port 80..."
-sudo netstat -tuln | grep :80
+sudo netstat -tuln | grep :80 || echo "Nginx is not listening on port 80."
 
-# Output success message
-echo "Nginx should now be listening on port 80."
+# Check for errors in Nginx logs
+echo "Checking for any errors in Nginx logs..."
+sudo tail -n 20 /var/log/nginx/error.log
+
+# Test if Nginx serves the page on port 80
+echo "Testing if Nginx is serving the page on port 80..."
+curl -I localhost:80
 
