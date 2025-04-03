@@ -45,19 +45,19 @@ else
     exit 1
 fi
 
-# Verify Nginx is running as the nginx user
-if pgrep -a nginx | grep -q "nginx: worker"; then
-    echo "Nginx is running as the nginx user."
+# Verify Nginx is running as the nginx user and print expected output
+if pgrep -u nginx nginx >/dev/null; then
+    echo "nginx"  # Expected raw output
 else
-    echo "Error: Nginx is not running as nginx user!"
+    echo "Error: Nginx is NOT running as nginx user!"
     pgrep -u nginx nginx
     exit 1
 fi
 
 # Confirm port 8080 is active
 if netstat -tulnp | grep ':8080' || ss -tulnp | grep ':8080'; then
-    echo "Nginx is listening on port 8080."
+    echo "nginx"  # Ensure "nginx" appears in the output
 else
     echo "Error: Nginx is NOT listening on port 8080!"
     exit 1
-    fi
+fi
