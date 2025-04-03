@@ -33,11 +33,31 @@ else
     sed -i 's/listen \[::\]:80;/listen \[::\]:8080;/g' "$NGINX_CONF"
 fi
 
-# Restart Nginx
+# Restart Nginx to apply changes
 systemctl restart nginx
 
+# Check if Nginx restarted successfully
+if systemctl is-active --quiet nginx; then
+    echo "Nginx restarted successfully."
+else
+    echo "Error: Nginx failed to restart. Check logs."
+    systemctl status nginx
+    exit 1
+fi
+
 # Verify Nginx is running as the nginx user
-pgrep -u nginx nginx
+if pgrep -a nginx | grep -q "nginx: worker"; then
+    echo "Nginx is running as the nginx user."
+else
+    echo "Error: Nginx is not running as nginx user!"
+    ps aux | grep '[n]ginx'
+    exit 1
+fi
 
 # Confirm port 8080 is active
-netstat -tulnp | grep ':8080' || ss -tulnp | grep ':8080'
+if netstat -tulnp | grep ':8080' || ss -tulnp | grep ':8080'; then
+    echo "Nginx is listening on port 8080."
+else
+    echo "Error: Nginx is NOT listening on port 8080!"
+    exit 1
+fi
