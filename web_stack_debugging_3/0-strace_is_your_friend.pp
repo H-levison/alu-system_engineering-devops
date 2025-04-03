@@ -28,5 +28,6 @@ class apache_fix {
     }
 }
 
+# Include the apache_fix class directly (without needing autoload module structure)
 include apache_fix
 
