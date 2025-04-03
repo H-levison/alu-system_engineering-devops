@@ -7,6 +7,6 @@ fi
 
 USER=$1
 
-# Run 'whoami' as the specified user
-su - "$USER" -c "whoami"
+# Run 'whoami' as the specified user without requiring a home directory
+su "$USER" -s /bin/sh -c "whoami"
 
