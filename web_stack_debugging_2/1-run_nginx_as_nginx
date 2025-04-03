@@ -37,7 +37,7 @@ fi
 systemctl restart nginx
 
 # Verify Nginx is running as the nginx user
-ps aux | grep '[n]ginx'
+pgrep -u nginx nginx
 
 # Confirm port 8080 is active
 netstat -tulnp | grep ':8080' || ss -tulnp | grep ':8080'
