@@ -3,18 +3,18 @@
 
 class apache_fix {
     package { 'apache2':
-        ensure => installed,
+        ensure  => 'installed',
     }
 
     service { 'apache2':
-        ensure  => running,
+        ensure  => 'running',
         enable  => true,
         require => Package['apache2'],
     }
 
     # Ensure Apache's root directory has correct permissions
     file { '/var/www/html':
-        ensure  => directory,
+        ensure  => 'directory',
         owner   => 'www-data',
         group   => 'www-data',
         mode    => '0755',
@@ -28,6 +28,5 @@ class apache_fix {
     }
 }
 
-# Include the apache_fix class directly (without needing autoload module structure)
+# Apply the apache_fix class
 include apache_fix
-
