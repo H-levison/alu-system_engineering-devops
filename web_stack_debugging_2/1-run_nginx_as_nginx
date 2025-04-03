@@ -1,36 +1,43 @@
 #!/usr/bin/env bash
-# Ensure script runs as root
+# Ensure the script runs as root
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run as root!"
     exit 1
 fi
 
-# Create nginx user if it doesn't exist
+# Ensure nginx user exists
 if ! id -u nginx >/dev/null 2>&1; then
     useradd -r -d /var/www -s /sbin/nologin nginx
 fi
 
-# Modify Nginx config to:
-# - Run as nginx user
-# - Listen on port 8080
-
+# Define Nginx config paths
 NGINX_CONF="/etc/nginx/nginx.conf"
+NGINX_DEFAULT="/etc/nginx/sites-available/default"
 
-if [ -f "$NGINX_CONF" ]; then
-    # Update 'user' directive to run as nginx user
-    sed -i 's/^user .*/user nginx;/' "$NGINX_CONF"
-
-    # Update default server block to listen on port 8080
-    sed -i 's/listen 80;/listen 8080;/g' /etc/nginx/sites-available/default
-    sed -i 's/listen \[::\]:80;/listen \[::\]:8080;/g' /etc/nginx/sites-available/default
-else
+# Ensure Nginx configuration exists
+if [ ! -f "$NGINX_CONF" ]; then
     echo "Error: Nginx configuration file not found!"
     exit 1
 fi
 
-# Restart Nginx to apply changes
+# Modify Nginx to run as nginx user
+sed -i 's/^user .*/user nginx;/' "$NGINX_CONF"
+
+# Update server block to listen on port 8080
+if [ -f "$NGINX_DEFAULT" ]; then
+    sed -i 's/listen 80;/listen 8080;/g' "$NGINX_DEFAULT"
+    sed -i 's/listen \[::\]:80;/listen \[::\]:8080;/g' "$NGINX_DEFAULT"
+else
+    echo "Warning: Default site config not found, checking nginx.conf"
+    sed -i 's/listen 80;/listen 8080;/g' "$NGINX_CONF"
+    sed -i 's/listen \[::\]:80;/listen \[::\]:8080;/g' "$NGINX_CONF"
+fi
+
+# Restart Nginx
 systemctl restart nginx
 
-# Confirm Nginx is running as the nginx user
-ps aux | grep [n]ginx
+# Verify Nginx is running as the nginx user
+ps aux | grep '[n]ginx'
 
+# Confirm port 8080 is active
+netstat -tulnp | grep ':8080' || ss -tulnp | grep ':8080'
