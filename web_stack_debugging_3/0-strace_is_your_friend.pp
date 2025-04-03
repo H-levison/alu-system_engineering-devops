@@ -1,3 +1,6 @@
+# This Puppet script automates the fix for Apache 500 errors by ensuring Apache is installed, running,
+# and has the correct directory permissions and necessary modules enabled.
+
 class apache_fix {
     package { 'apache2':
         ensure => installed,
